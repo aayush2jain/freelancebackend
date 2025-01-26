@@ -14,7 +14,7 @@ const adminRouter = require('./routes/admin.route.js');
 require('dotenv').config();
 app.use(
 	cors({
-		origin: ["https://misthan-five.vercel.app","http://localhost:3000"],
+		origin: ["https://wepreorder.vercel.app","http://localhost:3000"],
 		credentials: true,
 	})
 );

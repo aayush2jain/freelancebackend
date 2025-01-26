@@ -12,7 +12,7 @@
   "dest": "index.js",
   "methods":["POST","GET", "PUT", "DELETE", "PATCH", "OPTIONS"],
   "headers":{
-    "Access-Control-Allow-Origin":"https://misthan-five.vercel.app/"
+    "Access-Control-Allow-Origin":"https://wepreorder.vercel.app/"
   }
    }
  ]
