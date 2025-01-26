@@ -5,8 +5,6 @@ const path = require('path');
 const fs = require('fs');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
-const multer = require('multer');
-
 const { createProduct,getAllProduct } = require('../controllers/product.js');
 const { getProduct } = require('../controllers/product.js');
 
