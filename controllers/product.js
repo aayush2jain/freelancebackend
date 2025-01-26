@@ -2,6 +2,7 @@ const Product = require('../models/product.model.js');
 const multer = require("multer");
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
+const streamifier = require('streamifier');
 const deleteProduct = async(req,res)=>{
      try {
     const productId = req.params.id;
@@ -15,13 +16,6 @@ const deleteProduct = async(req,res)=>{
     res.status(500).json({ message: "Error deleting product", error });
   }
 }
-
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
 const uploadOnCloudinary = async (localFilePath, resourceType = "auto") => {
     try {
         if (!localFilePath) throw new Error("No file path provided");
@@ -48,6 +42,22 @@ const uploadOnCloudinary = async (localFilePath, resourceType = "auto") => {
     }
 };
 
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const uploadToCloudinary = (fileBuffer, resourceType) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({ resource_type: resourceType }, (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+        });
+        // Convert buffer to stream and pipe it to Cloudinary
+        streamifier.createReadStream(fileBuffer).pipe(stream);
+    });
+};
 // Create a new product
 const createProduct = async (req, res) => {
     const { name, price, description, goalamount,category } = req.body;
@@ -62,7 +72,7 @@ const createProduct = async (req, res) => {
             const fileKey = `image${i}`;
             if (req.files[fileKey]) {
                 console.log(`Uploading image ${fileKey}:`, req.files[fileKey][0].path);
-                const uploadedImage = await uploadOnCloudinary(req.files[fileKey][0].path);
+                const uploadedImage = await uploadToCloudinary(req.files[fileKey][0].path.buffer,'image');
                 if (uploadedImage) {
                     imageUrls.push(uploadedImage.url); // Collect all image URLs
                 }

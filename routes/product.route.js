@@ -3,7 +3,6 @@ const router = express.Router();
 const multer = require("multer");
 const path = require('path');
 const fs = require('fs');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
 const { createProduct,getAllProduct } = require('../controllers/product.js');
 const { getProduct } = require('../controllers/product.js');
