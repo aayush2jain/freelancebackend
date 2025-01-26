@@ -41,7 +41,7 @@ const register = async (req, res, next) => {
 
         console.log("User registered:", user);
         //    Set cookie options based on environment
-        const isProduction = false;
+        const isProduction = true;
         const options = {
             httpOnly: true,
             secure: isProduction, // secure in production only
@@ -97,7 +97,7 @@ const loginUser = async (req, res, next) => {
            // Set cookie options based on environment
        
         // res.status(200).json(loggedInUser);
-         const isProduction = false;
+         const isProduction = true;
         const options = {
             httpOnly: true,
             secure: isProduction, // secure in production only
