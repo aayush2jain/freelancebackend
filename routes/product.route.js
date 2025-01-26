@@ -5,9 +5,10 @@ const multer = require("multer");
 const { createProduct,getAllProduct } = require('../controllers/product.js');
 const { getProduct } = require('../controllers/product.js');
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Adjust to your desired upload directory
-  },
+    destination: (req, file, cb) => {
+        const uploadPath = path.join(__dirname, 'uploads');
+        cb(null, uploadPath);
+    },
   filename: (req, file, cb) => {
     cb(null, `${file.originalname}`);
   },
