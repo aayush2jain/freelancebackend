@@ -7,13 +7,18 @@ const { createProduct,getAllProduct } = require('../controllers/product.js');
 const { getProduct } = require('../controllers/product.js');
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadPath = path.join(__dirname, 'uploads');
+        const uploadDir = path.join(__dirname, 'uploads');
+// Ensure uploads directory exists
+    if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+     }
         cb(null, uploadPath);
     },
   filename: (req, file, cb) => {
     cb(null, `${file.originalname}`);
   },
 });
+
 
 const upload = multer({ storage });
 router.post(
