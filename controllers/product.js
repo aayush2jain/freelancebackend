@@ -72,7 +72,7 @@ const createProduct = async (req, res) => {
             const fileKey = `image${i}`;
             if (req.files[fileKey]) {
                 console.log(`Uploading image ${fileKey}:`, req.files[fileKey][0].path);
-                const uploadedImage = await uploadToCloudinary(req.files[fileKey][0].path.buffer,'image');
+                const uploadedImage = await uploadToCloudinary(req.files[fileKey][0].buffer,'image');
                 if (uploadedImage) {
                     imageUrls.push(uploadedImage.url); // Collect all image URLs
                 }
