@@ -1,0 +1,14 @@
+const express = require('express');
+const router = express.Router();
+const { verifyJWT } = require('../controllers/auth.js');
+const { register,loginUser,getCurrentUser } = require('../controllers/user.js');
+const { createOrder } = require('../controllers/order.js');
+const { userOrder} = require('../controllers/order.js');
+const { userAppointment} = require('../controllers/appointment.js');
+router.post('/register',register);
+router.post('/login',loginUser);
+router.get('/getuser',verifyJWT,getCurrentUser);
+router.post('/order',createOrder);
+router.get('/order/:userId',userOrder);
+router.get('/appointement/:id',userAppointment);
+module.exports = router;
