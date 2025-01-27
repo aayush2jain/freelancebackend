@@ -18,7 +18,7 @@ const orderSchema = new Schema({
     pincode: { type: Number, required: true },
     quantity: { type: Number},
     address: { type: String, required: true },
-    status: { type: String, required: true, enum: ['Incart', 'pending', 'delivered', 'cancelled'], default: 'Incart' }
+    status: { type: String, required: true, enum: ['Incart', 'pending', 'delivered', 'cancelled'], default: 'pending' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

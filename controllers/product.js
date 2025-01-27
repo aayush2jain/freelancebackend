@@ -49,6 +49,13 @@ cloudinary.config({
 });
 
 const uploadToCloudinary = (fileBuffer, resourceType) => {
+
+  cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream({ resource_type: resourceType }, (error, result) => {
             if (error) return reject(error);
@@ -60,35 +67,54 @@ const uploadToCloudinary = (fileBuffer, resourceType) => {
 };
 // Create a new product
 const createProduct = async (req, res) => {
-    const { name, price, description, goalamount,category } = req.body;
+    const { name, price, description, goalamount, category, timeDuration } = req.body;
 
-    console.log("Product Data:", { name, price, description, goalamount, category });
+    console.log("Product Data:", { name, price, description, goalamount,timeDuration,category });
 
     try {
-        // Ensure req.files is handled per individual fields (image1, image2, etc.)
-        const imageUrls = [];
+        // Ensure req.files exists
+        if (!req.files) {
+            return res.status(400).json({ message: 'No files uploaded.' });
+        }
 
+        // Collect image URLs
+        const imageUrls = [];
         for (let i = 1; i <= 4; i++) {
             const fileKey = `image${i}`;
             if (req.files[fileKey]) {
                 console.log(`Uploading image ${fileKey}:`, req.files[fileKey][0].path);
-                const uploadedImage = await uploadToCloudinary(req.files[fileKey][0].buffer,'image');
+                const uploadedImage = await uploadToCloudinary(req.files[fileKey][0].buffer, 'image');
                 if (uploadedImage) {
-                    imageUrls.push(uploadedImage.url); // Collect all image URLs
+                    imageUrls.push(uploadedImage.url);
                 }
             }
         }
 
+        // Upload brochure if available
+        let brochureLink = null;
+        if (req.files.brochure) {
+            const uploadedBrochure = await uploadToCloudinary(req.files.brochure[0].buffer, 'image');
+            brochureLink = uploadedBrochure?.url || null; 
+        }
+
         console.log("Uploaded Images:", imageUrls);
 
-        // Create a new product instance with the image URLs
+        // Validate required fields
+        // if (!name || !price || !description || !goalamount || !category || !timerDuration) {
+        //     return res.status(400).json({ message: 'All fields are required.' });
+        // }
+
+        // Create a new product instance
         const newProduct = new Product({
             name,
             price,
-            goalamount,
             description,
-            image: imageUrls, // Store the array of image URLs
+            goalamount,
             category,
+            image: imageUrls, // Array of uploaded image URLs
+            timeDuration: timeDuration || 3600, // Default 1 hour if not provided
+            startTime: new Date(), // Current timestamp
+            brochure: brochureLink,
         });
 
         // Save the product to the database
@@ -97,11 +123,11 @@ const createProduct = async (req, res) => {
         // Return the saved product as a response
         res.status(200).json(savedProduct);
     } catch (error) {
-        // Handle errors and send a proper response
         console.error("Error creating product:", error);
         res.status(500).json({ message: 'Error creating product', error });
     }
 };
+
 
 const getAllProduct = async (req, res) => {
     try {
@@ -117,6 +143,7 @@ const getProduct = async (req, res) => {
     console.log("Product:", req.params);
     const { id } = req.params;
     console.log("Product ID:", id);
+
     try {
         // Fetch the product by ID from the database
         const product = await Product.findById(id);
@@ -126,15 +153,26 @@ const getProduct = async (req, res) => {
             return res.status(404).json({ message: 'Product not found' });
         }
 
+        // Calculate elapsed time and remaining time
+        const elapsedTime = Math.floor((new Date() - product.startTime) / 1000); // Elapsed seconds
+        const remainingTime = Math.max(product.timeDuration - elapsedTime, 0);
+
+        // Attach the remaining time to the product details
+        const productWithTimer = {
+            ...product.toObject(),
+            remainingTime,
+        };
+
         // Send the product details as the response
-        res.status(200).json(product);
+        res.status(200).json(productWithTimer);
     } catch (error) {
         console.error('Error fetching product:', error);
 
         // Return a 500 error for any server issues
         res.status(500).json({ message: 'Error fetching product details', error });
     }
-}
+};
+
 module.exports = {
     createProduct,
     getAllProduct,

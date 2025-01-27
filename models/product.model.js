@@ -10,6 +10,12 @@ const productSchema = new Schema({
     totalprice: {
         type: Number,
     },
+    timeDuration:{
+        type: Number,
+    },
+    startTime:{
+        type: Date,
+    },
     amount: {
         type: Number,
         default:0,
@@ -22,6 +28,9 @@ const productSchema = new Schema({
     },
     image: {
         type: [String],
+    },
+    brochure:{
+        type: String,
     },
     category: {
         type: String,

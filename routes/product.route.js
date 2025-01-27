@@ -17,6 +17,7 @@ router.post(
     { name: "image2", maxCount: 1 },
     { name: "image3", maxCount: 1 },
     { name: "image4", maxCount: 1 },
+    {name: "brochure", maxCount: 1},
   ]),
   createProduct
 );
